@@ -1,0 +1,38 @@
+name: Automated Code Review Bot
+
+on:
+  pull_request:
+    types: [opened, synchronize]  # Trigger on PR creation or update
+
+jobs:
+  review-code:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Check out the repository
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Debug token
+      - name: Debug token
+        run: echo "Token: ${{ secrets.GH_PAT }}"
+
+      # Step 3: Set up Python
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      # Step 4: Install dependencies
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install requests pygithub
+
+      # Step 5: Run the code review script
+      - name: Run code review bot
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}  # Use the personal access token
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          python code_review_bot.py
